@@ -1,6 +1,5 @@
-import { auth } from './index.js'
+import { auth } from './init.js'
 import { sendSignInLinkToEmail, createUserWithEmailAndPassword, signInWithEmailLink, isSignInWithEmailLink, onAuthStateChanged, signInWithEmailAndPassword, signInAnonymously } from "firebase/auth";
-
 
 const actionCodeSettings = {
   "url": location.origin + '/sign-in/confirm',
