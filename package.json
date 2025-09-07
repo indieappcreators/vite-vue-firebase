@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "firebase emulators:exec --only auth,firestore 'npm run dev:vite'",
+    "dev:vite": "vite",
     "dev:firebase": "firebase emulators:start --only auth,firestore",
-    "dev:full": "firebase emulators:exec --only auth,firestore 'npm run dev'",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kill:firebase": "lsof -t -i :9099 -i:5001 -i:8090 -i:4000 -i:8080 -i:8085 | xargs kill -9"
   },
   "dependencies": {
     "vue": "^3.5.13",
