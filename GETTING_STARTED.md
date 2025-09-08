@@ -15,11 +15,11 @@ npm install
 ### 3. Start Development
 ```bash
 # Start everything with Firebase exec (recommended)
-npm run dev:full
+npm run dev
 
 # Or separately:
 npm run dev:firebase  # Firebase emulators
-npm run dev          # Vue dev server
+npm run dev:vite          # Vue dev server
 ```
 
 ## 🌐 Access Points
