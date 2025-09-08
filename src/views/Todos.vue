@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { checkAuthentication, getCurrentUser } from '../firebase/auth'
-import { createTodo, fetchAllTodos, deleteTodo } from '../firebase/todos'
+import { checkAuthentication } from '../firebase/auth'
+import { createTodo, fetchAllTodos, deleteTodo, updateTodo } from '../firebase/todos'
+import Nav from '../components/Nav.vue'
 
 const router = useRouter()
 const user = ref<any>(null)
@@ -11,6 +12,8 @@ const isLoading = ref(true)
 const todos = ref<Record<string, any>>({})
 const newTodoText = ref('')
 const isAddingTodo = ref(false)
+const editingTodoId = ref<string | null>(null)
+const editingTodoText = ref('')
 
 onMounted(async () => {
   try {
@@ -56,13 +59,30 @@ const addTodo = async () => {
   }
 }
 
-const removeTodo = async (todoId: string) => {
+const removeTodoHandler = async (todoId: string) => {
   try {
     await deleteTodo(todoId)
     await loadTodos()
   } catch (error) {
     console.error('Error deleting todo:', error)
   }
+}
+
+const updateTodoHandler = async () => {
+  if (!editingTodoId.value) return
+  try {
+    await updateTodo(editingTodoId.value, { text: editingTodoText.value })
+    editingTodoId.value = null
+    editingTodoText.value = ''
+    await loadTodos()
+  } catch (error) {
+    console.error('Error updating todo:', error)
+  }
+}
+
+const editTodoHandler = (todoId: string) => {
+  editingTodoId.value = todoId
+  editingTodoText.value = todos.value[todoId].text
 }
 
 const goToHome = () => {
@@ -75,6 +95,7 @@ const todoList = computed(() => Object.entries(todos.value).map(([id, todo]) => 
 <template>
   <div>
     <h1>Todo App</h1>
+    <Nav class="nav" />
     
     <div v-if="isLoading">
       <p>Loading...</p>
@@ -108,20 +129,39 @@ const todoList = computed(() => Object.entries(todos.value).map(([id, todo]) => 
           <p>No todos yet. Add one above!</p>
         </div>
         <div v-else>
-          <div v-for="todo in todoList" :key="todo.id">
-            <span>{{ todo.text }}</span>
-            <button @click="removeTodo(todo.id)">Delete</button>
+          <div v-for="todo in todoList" :key="todo.id" class="todoItem">
+            <template v-if="editingTodoId === todo.id">
+              <input type="checkbox" v-model="todo.completed" />
+              <input type="text" v-model="editingTodoText" class="todoItem-text" />
+              <button @click="updateTodoHandler">Save</button>
+              <button @click="removeTodoHandler(todo.id)">Delete</button>
+            </template>
+            <template v-else>
+              <input type="checkbox" v-model="todo.completed" />
+              <p class="todoItem-text">{{ todo.text }}</p>
+              <button @click="editTodoHandler(todo.id)">Edit</button>
+              <button @click="removeTodoHandler(todo.id)">Delete</button>
+            </template>
           </div>
         </div>
-      </div>
-      
-      <div>
-        <button @click="goToHome">Back to Home</button>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+p {
+  margin: 0;
+}
+
+.todoItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.todoItem-text {
+  min-width: 200px;
+}
 /* No custom styles */
 </style>

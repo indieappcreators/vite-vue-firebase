@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { checkAuthentication, getCurrentUser, signOut } from '../firebase/auth'
+import { checkAuthentication, getCurrentUser, signOut } from '../firebase/auth';
+import Nav from '../components/Nav.vue'
 
 const router = useRouter()
 const user = ref<any>(null)
@@ -43,7 +44,9 @@ const goToTodos = () => {
 <template>
   <div>
     <h1>Home</h1>
-    
+    <Nav class="nav" />
+
+
     <div v-if="isLoading">
       <p>Loading...</p>
     </div>
@@ -51,7 +54,6 @@ const goToTodos = () => {
     <div v-else-if="isAuthenticated && user">
       <h2>Hello, {{ user.email }}</h2>
       <p>You are signed in.</p>
-      <button @click="handleSignOut">Sign Out</button>
       <button @click="goToTodos">View Todos</button>
     </div>
     

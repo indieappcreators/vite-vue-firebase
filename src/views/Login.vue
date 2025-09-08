@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendSignInLink, signInWithLink } from '../firebase/auth.js'
+import Nav from '../components/Nav.vue'
 
 const router = useRouter()
 const email = ref('')
@@ -20,7 +21,11 @@ const handleSendSignInLink = async () => {
   
   try {
     await sendSignInLink({ email: email.value })
-    showMessage('Check your email for the sign-in link!', 'success')
+    if(import.meta.env.DEV) {
+      showMessage('Check command line for the sign-in link!', 'success')
+    } else {
+      showMessage('Check your email for the sign-in link!', 'success')
+    }
     email.value = ''
   } catch (error) {
     showMessage('Failed to send sign-in link. Please try again.', 'error')
@@ -65,23 +70,27 @@ checkSignInLink()
 <template>
   <div>
     <h1>Login</h1>
-    
+    <Nav class="nav" />
     <form @submit.prevent="handleSendSignInLink">
       <div>
-        <label for="email">Email:</label>
-        <input
-          id="email"
-          v-model="email"
-          type="email"
-          required
-          :disabled="isLoading"
-        />
+        <fieldset class="fieldset">
+          <legend><label for="email">Email:</label></legend>
+          <input
+            id="email"
+            v-model="email"
+            type="email"
+            required
+            :disabled="isLoading"
+          />
+        </fieldset>
       </div>
-      
-      <button type="submit" :disabled="isLoading">
-        <span v-if="isLoading">Sending...</span>
-        <span v-else>Send Sign-In Link</span>
-      </button>
+
+      <p>
+        <button type="submit" :disabled="isLoading">
+          <span v-if="isLoading">Sending...</span>
+          <span v-else>Send Sign-In Link</span>
+        </button>
+      </p>
     </form>
     
     <div v-if="message">
@@ -91,5 +100,14 @@ checkSignInLink()
 </template>
 
 <style scoped>
+
+.fieldset {
+  border: 0;
+  padding: 0;
+}
+
+.submit {
+  text-align: right;
+}
 /* No custom styles */
 </style>
